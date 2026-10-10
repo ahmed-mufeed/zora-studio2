@@ -1,9 +1,6 @@
 import { useMemo, useRef, useState, type CSSProperties, type ReactNode, forwardRef } from "react";
-// استيراد أدوات التوجيه واستخراج معاملات الرابط من React Router
 import { Link, useParams } from "react-router-dom";
-// استيراد أدوات التحريك والتأثيرات الانتقالية من Framer Motion
 import { AnimatePresence, motion } from "framer-motion";
-// استيراد الأيقونات المساعدة من مكتبة Lucide
 import {
   Check,
   ClipboardList,
@@ -14,23 +11,17 @@ import {
   X,
   Eye,
 } from "lucide-react";
-// استيراد مكون خلفية البرق ومكونات الواجهة المشتركة
 import Lightning from "../components/Lightning";
 import { Chip, Reveal, SocialIcon } from "../components/ui";
-// استيراد دوال المتجر العام وتوليد رابط الواتساب وأداة تصدير الـ PDF
 import { fmtPrice, useSite, useToast, waLink } from "../lib/store";
 import { exportElementToPdf } from "../lib/pdf";
 import type { BriefQuestion, Service, Settings } from "../lib/types";
 
-// استيراد الصورة الرسمية لشعار زورا استوديو
 import zoraLogoImg from "../logos/zora-logo.png";
-// 🔴 استيراد صورة الخلفية الكاملة من مجلد assets
 import pdfBgImg from "../assets/pdf-bg.jpg";
 
-// نوع يمثل كائن إجابات البريف (معرف السؤال -> الإجابة كنص أو مصفوفة أو رقم)
 type Answers = Record<string, string | string[] | number>;
 
-// دالة تهيئة الإجابات الافتراضية بناءً على نوع كل سؤال
 const initAnswers = (qs: BriefQuestion[]): Answers =>
   Object.fromEntries(
     qs.map((q) => [
@@ -40,14 +31,10 @@ const initAnswers = (qs: BriefQuestion[]): Answers =>
   );
 
 export default function Brief() {
-  // استخراج معرّف الخدمة من رابط الصفحة الحالية
   const { serviceId } = useParams();
   const { state } = useSite();
-  
-  // البحث عن الخدمة المطلوبة من قائمة الخدمات المخزنة
   const service = state.services.find((s) => s.id === serviceId);
 
-  // شاشة حماية: تظهر في حال كانت الخدمة غير موجودة أو تم إخفاؤها من لوحة التحكم
   if (!service || service.hidden) {
     return (
       <main className="grid min-h-screen place-items-center bg-ink px-5">
@@ -62,29 +49,22 @@ export default function Brief() {
     );
   }
 
-  // تمرير مفتاح فريد لضمان إعادة تهيئة النموذج بالكامل عند التبديل بين الخدمات
   return <BriefForm key={service.id} service={service} settings={state.settings} />;
 }
 
-/* ==================================================================
-   المكون الرئيسي لنموذج تعبئة واستخراج البريف
-   ================================================================== */
-
 function BriefForm({ service, settings }: { service: Service; settings: Settings }) {
   const { toast } = useToast();
-  const qs = service.questions; // مصفوفة أسئلة هذه الخدمة
+  const qs = service.questions;
   
-  // الحالات التفاعلية للنموذج
   const [answers, setAnswers] = useState<Answers>(() => initAnswers(qs));
-  const [customMode, setCustomMode] = useState<Record<string, boolean>>({}); // تفعيل خيار كتابة إجابة مخصصة
-  const [customText, setCustomText] = useState<Record<string, string>>({}); // النصوص المكتوبة يدوياً
-  const [attempted, setAttempted] = useState(false); // هل حاول المستخدم التصدير؟
-  const [exporting, setExporting] = useState(false); // حالة تحميل جاري إنشاء الـ PDF
-  const [done, setDone] = useState(false); // حالة فتح نافذة النجاح بعد التصدير
-  const [showPreview, setShowPreview] = useState(false); // حالة إظهار معاينة الـ PDF لايف
-  const pdfRef = useRef<HTMLDivElement>(null); // مرجع لعنصر الـ PDF لتصييره
+  const [customMode, setCustomMode] = useState<Record<string, boolean>>({});
+  const [customText, setCustomText] = useState<Record<string, string>>({});
+  const [attempted, setAttempted] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [done, setDone] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const pdfRef = useRef<HTMLDivElement>(null);
 
-  // فحص ما إذا كان السؤال قد تمت الإجابة عليه فعلياً
   const isAnswered = (q: BriefQuestion): boolean => {
     if (q.type === "slider") return true;
     if (q.type === "choice") {
@@ -97,13 +77,9 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
     return Boolean((answers[q.id] as string)?.trim());
   };
 
-  // فحص صلاحية السؤال (صالح إذا كان اختيارياً أو إذا تمت الإجابة عليه)
   const valid = (q: BriefQuestion) => !q.required || isAnswered(q);
-  
-  // حساب عدد الأسئلة المجاب عنها لحساب شريط التقدم
   const answeredCount = useMemo(() => qs.filter((q) => isAnswered(q)).length, [answers, customMode, customText, qs]);
 
-  // دالة تنسيق الإجابة وتحويلها لنص مقروء لعرضه داخل مستند الـ PDF
   const formatAnswer = (q: BriefQuestion): string => {
     if (q.type === "slider") return `${((answers[q.id] as number) ?? 0).toLocaleString("en-US")} ${q.unit ?? ""}`.trim();
     if (q.type === "choice") return customMode[q.id] ? customText[q.id]?.trim() || "—" : (answers[q.id] as string) || "—";
@@ -115,14 +91,10 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
     return ((answers[q.id] as string) ?? "").trim() || "—";
   };
 
-  // دالة فحص وتصدير ملف الـ PDF
   const doExport = async () => {
     setAttempted(true);
-    
-    // البحث عن أول سؤال إجباري غير مكتمل
     const firstInvalid = qs.find((q) => !valid(q));
     if (firstInvalid) {
-      // التمرير السلس بالصفحة نحو السؤال الناقص
       document.getElementById(`q-${firstInvalid.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
       toast("أكمل الأسئلة الإجبارية أولًا", "warn");
       return;
@@ -132,11 +104,9 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
     setExporting(true);
     
     try {
-      // انتظار بسيط لضمان اكتمال تصيير الخطوط والصور
       await new Promise((r) => setTimeout(r, 150));
-      // توليد ملف الـ PDF وتنزيله
       await exportElementToPdf(pdfRef.current, `zora-brief-${service.id}.pdf`);
-      setDone(true); // فتح نافذة النجاح
+      setDone(true);
     } catch {
       toast("تعذّر إنشاء الملف — حاول مرة أخرى", "warn");
     } finally {
@@ -144,14 +114,10 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
     }
   };
 
-  // تحديث إجابة سؤال معين
   const set = (qid: string, v: string | string[] | number) => setAnswers((a) => ({ ...a, [qid]: v }));
 
   return (
     <main className="bg-ink">
-      {/* =========================================================
-          هيدر الصفحة التعريفي
-          ========================================================= */}
       <section className="relative overflow-hidden pb-16 pt-36">
         <Lightning />
         <div className="relative z-10 mx-auto max-w-4xl px-5 text-center">
@@ -165,13 +131,8 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
         </div>
       </section>
 
-      {/* =========================================================
-          جسم النموذج: قائمة الأسئلة + الشريط الجانبي للملخص
-          ========================================================= */}
       <section className="slant-r bg-paper pb-28 pt-20 text-ink md:pt-24">
         <div className="mx-auto grid max-w-6xl items-start gap-8 px-5 lg:grid-cols-[1fr_350px]">
-          
-          {/* قسم بطاقات الأسئلة التفاعلية */}
           <div className="space-y-5">
             {qs.map((q, i) => {
               const invalid = attempted && !valid(q);
@@ -183,7 +144,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
                       invalid ? "border-rose-400" : "border-black/5"
                     }`}
                   >
-                    {/* ترويسة السؤال */}
                     <div className="mb-5 flex items-start gap-4">
                       <span className="chamfer-sm grid h-9 w-9 shrink-0 place-items-center bg-royal font-latin text-sm font-bold text-white">
                         {String(i + 1).padStart(2, "0")}
@@ -196,7 +156,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
                       </div>
                     </div>
 
-                    {/* حقل الاختيار المفرد (Choice) */}
                     {q.type === "choice" && (
                       <div className="flex flex-wrap gap-2.5">
                         {(q.options ?? []).map((opt) => {
@@ -234,7 +193,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
                       </div>
                     )}
 
-                    {/* حقل الاختيارات المتعددة (Checkbox) */}
                     {q.type === "checkbox" && (
                       <div className="flex flex-wrap gap-2.5">
                         {(q.options ?? []).map((opt) => {
@@ -264,7 +222,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
                       </div>
                     )}
 
-                    {/* حقل المنزلق الرقمي (Slider) */}
                     {q.type === "slider" && (
                       <SliderField
                         q={q}
@@ -273,7 +230,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
                       />
                     )}
 
-                    {/* حقل النص الحر (Text) */}
                     {q.type === "text" && (
                       <textarea
                         rows={3}
@@ -293,7 +249,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
             })}
           </div>
 
-          {/* الشريط الجانبي الثابت: ملخص الخدمة وزر التصدير */}
           <aside className="space-y-5 lg:sticky lg:top-28">
             <div className="overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm">
               <div className="relative h-36">
@@ -332,7 +287,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
                   </div>
                 )}
                 
-                {/* زر معاينة التصميم لايف */}
                 <button
                   onClick={() => setShowPreview(true)}
                   className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-neon bg-neon/10 px-6 py-3.5 text-sm font-extrabold text-neon transition-colors hover:bg-neon hover:text-ink"
@@ -340,7 +294,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
                   <Eye className="h-5 w-5" /> معاينة تصميم الـ PDF لايف
                 </button>
 
-                {/* زر تصدير وتنزيل ملف البريف PDF */}
                 <button
                   onClick={doExport}
                   disabled={exporting || service.status !== "available"}
@@ -367,11 +320,7 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
         </div>
       </section>
 
-      {/* =========================================================
-          مستند الـ PDF المنفصل للمعاينة وللتصدير بدون انحراف أو صفحات زائدة
-          ========================================================= */}
       {showPreview ? (
-        /* وضع المعاينة التفاعلية */
         <div className="fixed inset-0 z-[100] flex justify-center overflow-y-auto bg-black/80 py-10 backdrop-blur-sm">
           <button
             onClick={() => setShowPreview(false)}
@@ -390,7 +339,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
           </div>
         </div>
       ) : (
-        /* وضع التصدير المخفي بوضعية متناسقة مع أبعاد الصفحة */
         <div
           style={{
             position: "absolute",
@@ -409,9 +357,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
         </div>
       )}
 
-      {/* =========================================================
-          النافذة المنبثقة للنجاح والتوجيه للواتساب
-          ========================================================= */}
       <AnimatePresence>
         {done && (
           <motion.div
@@ -470,10 +415,6 @@ function BriefForm({ service, settings }: { service: Service; settings: Settings
   );
 }
 
-/* ==================================================================
-   مكونات الأزرار والمنزلق
-   ================================================================== */
-
 function OptionBtn({ active, onClick, children, square = false }: { active: boolean; onClick: () => void; children: ReactNode; square?: boolean; }) {
   return (
     <button type="button" onClick={onClick} className={`chamfer-sm flex items-center gap-2 px-4 py-2.5 text-sm font-extrabold transition-all duration-200 ${ active ? "bg-royal text-white glow-royal" : "border border-ink/15 bg-white text-ink/60 hover:border-royal/50 hover:text-royal" }`}>
@@ -502,10 +443,6 @@ function SliderField({ q, value, onChange }: { q: BriefQuestion; value: number; 
     </div>
   );
 }
-
-/* ==================================================================
-   هيكل وتصميم مستند الـ PDF المنشأ بمقاس A4 القياسي الدقيق (794px × 1123px)
-   ================================================================== */
 
 const BriefPdf = forwardRef<
   HTMLDivElement,
@@ -536,7 +473,6 @@ const BriefPdf = forwardRef<
         overflow: "hidden",
       }}
     >
-      {/* 🔴 1. صورة الخلفية الكلية المأخوذة من مجلد assets */}
       <img
         src={pdfBgImg}
         alt=""
@@ -552,7 +488,6 @@ const BriefPdf = forwardRef<
         }}
       />
 
-      {/* 🔴 2. محتوى الصفحة مصفوف فوق الخلفية مع زيف الشفافية */}
       <div
         style={{
           position: "relative",
@@ -563,7 +498,6 @@ const BriefPdf = forwardRef<
           boxSizing: "border-box",
         }}
       >
-        {/* هيدر المستند */}
         <div
           style={{
             padding: "28px 40px",
@@ -577,7 +511,7 @@ const BriefPdf = forwardRef<
             <img
               src={zoraLogoImg}
               alt="Zora Studio"
-              style={{ width: "52px", height: "52px", objectFit: "contain", display: "block", opacity: "0%", borderRadius: "8px", padding: "6px" }}
+              style={{ width: "52px", height: "52px", objectFit: "contain", display: "block", borderRadius: "8px", padding: "6px" }}
             />
           </div>
           <div style={{ textAlign: "left" }}>
@@ -588,7 +522,6 @@ const BriefPdf = forwardRef<
           </div>
         </div>
 
-        {/* 🔴 شريط تفاصيل الخدمة (تم تفريغ خلفيته الصلبة ليصبح شفافاً ويبرز خلفية assets) */}
         <div
           style={{
             background: "transparent",
@@ -608,7 +541,6 @@ const BriefPdf = forwardRef<
           </div>
         </div>
 
-        {/* مساحة الأسئلة (تتمدد بسلاسة لتملأ الصفحة) */}
         <div style={{ padding: "30px 40px", flex: 1, boxSizing: "border-box" }}>
           {rows.map((r, i) => (
             <div
@@ -643,7 +575,6 @@ const BriefPdf = forwardRef<
           ))}
         </div>
 
-        {/* الفوتر ومربع الواتساب (ملتصق دائماً بأسفل الصفحة) */}
         <div style={{ padding: "0 40px 28px 40px", marginTop: "auto", boxSizing: "border-box" }}>
           <div
             style={{

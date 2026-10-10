@@ -1,20 +1,16 @@
-// استيراد أدوات التحريك والتأثيرات البصرية من Framer Motion
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-// استيراد أداة التوجيه والروابط الداخلية من React Router
 import { Link } from "react-router-dom";
-// استيراد أيقونة النجمة من مكتبة Lucide (تمت إزالة أيقونة Zap بنجاح)
 import { Star } from "lucide-react";
 
 /* ================================================================
-   1. مكوّن الظهور التدريجي عند التمرير (Reveal)
-   يقوم بتحريك العناصر تدريجياً وإزالة الضبابية عنها فور دخولها نافذة العرض
+   1. مكوّن الظهور التدريجي عند التمرير (Reveal) - مصحح وآمن 100%
    ================================================================ */
 
 export function Reveal({
   children,
-  delay = 0, // زمن التأخير قبل بدء الحركة (بالثواني)
-  y = 30, // مقدار الإزاحة العمودية الأولية بالبكسل
+  delay = 0,
+  y = 20,
   className = "",
 }: {
   children: ReactNode;
@@ -24,10 +20,10 @@ export function Reveal({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y, filter: "blur(6px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-70px" }} // تفعيل الحركة لمرة واحدة فقط عند الاقتراب من العنصر
-      transition={{ duration: 0.75, delay, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.01, margin: "0px" }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}
@@ -37,19 +33,17 @@ export function Reveal({
 
 /* ================================================================
    2. مكوّن الشارات والوسوم التمهيدية (Chip)
-   شارة صغيرة مشطوفة الحواف تُستخدم كعلامة توضيحية أعلى العناوين
    ================================================================ */
 
 export function Chip({
   children,
-  tone = "neon", // نمط اللون: نيون (افتراضي)، ملكي، أو شفاف
+  tone = "neon",
   className = "",
 }: {
   children: ReactNode;
   tone?: "neon" | "royal" | "ghost";
   className?: string;
 }) {
-  // فئات التنسيق المحددة لكل مظهر لوني
   const styles = {
     neon: "bg-neon/10 text-neon border-neon/25",
     royal: "bg-royal/10 text-royal border-royal/20",
@@ -60,7 +54,6 @@ export function Chip({
     <span
       className={`chamfer-sm inline-flex items-center gap-1.5 border px-3.5 py-1.5 text-xs font-extrabold ${styles[tone]} ${className}`}
     >
-      {/* تمت إزالة أيقونة البرق Zap من هنا بنجاح */}
       {children}
     </span>
   );
@@ -68,15 +61,14 @@ export function Chip({
 
 /* ================================================================
    3. مكوّن ترويسة الأقسام (SectionHead)
-   توحيد هيكل العناوين الرئيسية للأقسام مع الشارة والوصف التوضيحي
    ================================================================ */
 
 export function SectionHead({
-  kicker, // النص التمهيدي المصغر داخل الشارة
-  title, // العنوان العريض الرئيسي
-  sub, // الفقرة الوصفية التوضيحية
-  light = false, // هل الترويسة فوق خلفية فاتحة؟
-  center = false, // محاذاة النص في المنتصف
+  kicker,
+  title,
+  sub,
+  light = false,
+  center = false,
   className = "",
 }: {
   kicker?: string;
@@ -88,10 +80,8 @@ export function SectionHead({
 }) {
   return (
     <Reveal className={`${center ? "text-center" : ""} ${className}`}>
-      {/* عرض الشارة التمهيدية إن وجدت مع ضبط لونها بحسب خلفية القسم */}
       {kicker && <Chip tone={light ? "royal" : "neon"}>{kicker}</Chip>}
       
-      {/* العنوان الرئيسي */}
       <h2
         className={`mt-4 text-3xl font-black leading-[1.18] md:text-[2.9rem] md:leading-[1.15] ${
           light ? "text-ink" : "text-paper"
@@ -100,7 +90,6 @@ export function SectionHead({
         {title}
       </h2>
       
-      {/* النص الوصفي الفرعي */}
       {sub && (
         <p
           className={`mt-4 max-w-2xl text-base font-semibold leading-relaxed md:text-lg ${
@@ -116,12 +105,10 @@ export function SectionHead({
 
 /* ================================================================
    4. أزرار وروابط الدعوة لاتخاذ إجراء (CTA Buttons)
-   أزرار تفاعلية بنمط مشطوف الزوايا مع تأثيرات التوهج عند التحويم
    ================================================================ */
 
 type Variant = "neon" | "ghost" | "royal" | "ink";
 
-// خريطة أنماط المظهر البصري للأزرار
 const VARIANTS: Record<Variant, string> = {
   neon: "bg-neon text-ink glow-neon hover:-translate-y-1",
   ghost: "border border-white/25 text-paper hover:bg-white/10 hover:-translate-y-1",
@@ -129,7 +116,6 @@ const VARIANTS: Record<Variant, string> = {
   ink: "bg-ink text-paper hover:bg-ink-2 hover:-translate-y-1",
 };
 
-// زر انتقال لمسار داخلي ضمن الموقع (React Router Link)
 export function CtaLink({
   to,
   variant = "neon",
@@ -151,7 +137,6 @@ export function CtaLink({
   );
 }
 
-// زر رابط خارجي (مواقع أخرى أو واتساب) يفتح في تبويب مستقل
 export function CtaA({
   href,
   variant = "neon",
@@ -177,17 +162,12 @@ export function CtaA({
 
 /* ================================================================
    5. مكوّن عرض تقييم النجوم (Stars)
-   يعرض 5 نجوم بدقة نسبية مئوية لدعم التقييمات الجزئية (مثل 4.5 من 5)
    ================================================================ */
 
 export function Stars({ rating, dark = false }: { rating: number; dark?: boolean }) {
-  // حساب النسبة المئوية للمساحة الممتلئة بناءً على التقييم من 5
   const pct = Math.max(0, Math.min(100, (rating / 5) * 100));
-  
-  // لون النجوم الفارغة بحسب وضع الإضاءة
   const base = dark ? "fill-white/15 text-white/15" : "fill-ink/10 text-ink/10";
   
-  // دالة مساعدة لرسم صف يحتوي على 5 نجوم
   const row = (filled: boolean) => (
     <div className="flex gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
@@ -198,10 +178,7 @@ export function Stars({ rating, dark = false }: { rating: number; dark?: boolean
 
   return (
     <div className="relative inline-block" dir="ltr">
-      {/* طبقة النجوم الفارغة الأساسية */}
       {row(false)}
-      
-      {/* طبقة النجوم الممتلئة الملونة مقصوصة العرض وفق النسبة المئوية الدقيقة */}
       <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: `${pct}%` }}>
         {row(true)}
       </div>
@@ -211,7 +188,6 @@ export function Stars({ rating, dark = false }: { rating: number; dark?: boolean
 
 /* ================================================================
    6. مكوّن مفتاح التبديل الثنائي (Toggle Switch)
-   مفتاح تفاعلي سلس لتفعيل أو تعطيل الإعدادات والخيارات
    ================================================================ */
 
 export function Toggle({
@@ -233,7 +209,6 @@ export function Toggle({
         checked ? "bg-neon" : "bg-ink/20"
       } ${disabled ? "opacity-40" : "cursor-pointer"}`}
     >
-      {/* الدائرة المنزلقة داخل المفتاح */}
       <span
         className={`absolute top-[3px] h-[18px] w-[18px] rounded-full shadow transition-all duration-300 ${
           checked ? "left-[23px] bg-ink" : "left-[3px] bg-white"
@@ -245,13 +220,11 @@ export function Toggle({
 
 /* ================================================================
    7. مكوّن أيقونات التواصل الاجتماعي المخصصة (SocialIcon)
-   رسومات شعارات المتجهات SVG لمنصات التواصل
    ================================================================ */
 
 export type SocialName = "instagram" | "tiktok" | "x" | "linkedin" | "whatsapp";
 
 export function SocialIcon({ name, className = "h-5 w-5" }: { name: SocialName; className?: string }) {
-  // رسم مخصص لأيقونة منصة انستقرام
   if (name === "instagram") {
     return (
       <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -262,7 +235,6 @@ export function SocialIcon({ name, className = "h-5 w-5" }: { name: SocialName; 
     );
   }
 
-  // مسارات متجهات SVG لباقي منصات التواصل
   const paths: Record<Exclude<SocialName, "instagram">, string> = {
     tiktok:
       "M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z",
@@ -282,7 +254,6 @@ export function SocialIcon({ name, className = "h-5 w-5" }: { name: SocialName; 
 
 /* ================================================================
    8. مكوّن الخطوط الهندسية المائلة (DiagonalStroke)
-   عنصر SVG زخرفي يعطي طابعاً تقنياً في الخلفيات
    ================================================================ */
 
 export function DiagonalStroke({ className = "" }: { className?: string }) {

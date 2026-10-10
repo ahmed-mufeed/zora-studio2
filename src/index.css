@@ -5,47 +5,36 @@
    إعدادات السمة وتخصيص المتغيرات (Theme Configuration)
    ========================================================================== */
 @theme {
-  /* لوحة الألوان المخصصة للهوية البصرية */
-  --color-ink: #292998;       /* اللون الداكن الأساسي - تم تفتيحه من #131319 */
-  --color-ink-2: #222230;     /* لون داكن ثانوي - تم تفتيحه من #1b1b23 */
-  --color-ink-3: #2b2b3a;     /* درجة ثالثة - تم تفتيحه من #24242f */
-  --color-royal: #332cb1;     /* اللون الأزرق الملكي الأساسي */
-  --color-royal-2: #2b10a5;   /* درجة ثانية أفتح للأزرق الملكي */
-  --color-paper: #f5f6fb;     /* اللون الفاتح/الأبيض المائل للرمادي */
-  --color-neon: #adff2b;      /* اللون النيوني الفسفوري */
+  --color-ink: #292998;
+  --color-ink-2: #222230;
+  --color-ink-3: #2b2b3a;
+  --color-royal: #332cb1;
+  --color-royal-2: #2b10a5;
+  --color-paper: #f5f6fb;
+  --color-neon: #adff2b;
 
-  /* الخطوط المستخدمة */
   --font-sans: "Cairo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-latin: "Space Grotesk", "Cairo", sans-serif;
 }
 
 /* ==========================================================================
-   حل مشكلة الاهتزاز والازاحة الأفقية أثناء السكرول
+   حل مشكلة الاهتزاز والازاحة الأفقية ومستشعر التمرير
    ========================================================================== */
 html {
   scroll-behavior: smooth;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  overscroll-behavior-x: none;
 }
 
 body {
   @apply bg-ink text-paper font-sans antialiased;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip; /* clip تمنع التمرير الأفقي دون كسر مستشعر حركات Framer Motion */
   position: relative;
-  overscroll-behavior-x: none;
 }
 
-/* تخصيص لون تحديد النصوص */
 ::selection {
   background: var(--color-neon);
   color: var(--color-ink);
 }
 
-/* تخصيص شريط التمرير الرئيسي */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -66,7 +55,6 @@ body {
    الحركات والعناصر الجمالية (Animations & Decorative)
    ========================================================================== */
 
-/* حركة الشريط المتحرك اللانهائي */
 @keyframes marquee {
   to {
     transform: translateX(-50%);
@@ -81,7 +69,6 @@ body {
   animation-play-state: paused;
 }
 
-/* حركة رسم خطوط الصواعق المتحركة (محفوظة كما هي) */
 @keyframes bolt-dash {
   0% {
     stroke-dashoffset: 620;
@@ -105,7 +92,6 @@ body {
   animation: bolt-dash 4.6s ease-in-out infinite;
 }
 
-/* حركة الطفو والتمايل الرأسي */
 @keyframes float-y {
   0%,
   100% {
@@ -119,7 +105,6 @@ body {
   animation: float-y 6s ease-in-out infinite;
 }
 
-/* حركة التوهج النبضي */
 @keyframes pulse-glow {
   0%,
   100% {
@@ -133,7 +118,6 @@ body {
   animation: pulse-glow 2.4s ease-out infinite;
 }
 
-/* طبقة تشويش سينمائي ناعمة */
 .grain {
   position: relative;
   isolation: isolate;
@@ -149,38 +133,29 @@ body {
 }
 
 /* ==========================================================================
-   الزوايا الدائرية بأسلوب الآيفون
-   (حافظت على أسماء الكلاسات القديمة حتى لا تحتاج لتعديل أي ملف آخر)
+   الزوايا الدائرية
    ========================================================================== */
 
-/* البطاقات والعناصر الكبيرة: زوايا دائرية بنصف قطر 24px */
 .chamfer {
   border-radius: 24px;
-  overflow: hidden; /* لقص أي محتوى داخلي (مثل الصور) ليتبع شكل الزوايا */
+  overflow: hidden;
 }
 
-/* الأزرار والعناصر الصغيرة: زوايا دائرية بنصف قطر 16px */
 .chamfer-sm {
   border-radius: 16px;
   overflow: hidden;
 }
 
-/* الأقسام الفاصلة: زوايا علوية دائرية كبيرة تتناسب مع حجم الشاشة */
 .slant-l,
 .slant-r {
   border-radius: clamp(28px, 5vw, 56px) clamp(28px, 5vw, 56px) 0 0;
   overflow: hidden;
 }
 
-/* إخفاء المربع الأخضر (الهايلايت) إذا كان فارغاً بدون أي نص بداخله.
-   :empty يستهدف العنصر الذي لا يحتوي أي محتوى إطلاقاً */
 span.chamfer-sm.bg-neon:empty {
   display: none;
 }
 
-/* تحسين اختياري: زوايا "سكويركل" الناعمة المستخدمة في تصاميم آبل.
-   تعمل فقط في المتصفحات الحديثة التي تدعمها، وتتجاهلها المتصفحات الأخرى
-   وتبقى الزوايا الدائرية العادية. */
 @supports (corner-shape: squircle) {
   .chamfer,
   .chamfer-sm,
@@ -190,11 +165,6 @@ span.chamfer-sm.bg-neon:empty {
   }
 }
 
-/* تم إزالة كلاسات النص المفرغ (text-stroke) بالكامل لإخفاء كلمة ZORA في الخلفية */
-/* تم إزالة: .text-stroke-paper */
-/* تم إزالة: .text-stroke-royal */
-
-/* تأثير ارتفاع البطاقة */
 .card-lift {
   transition:
     transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
@@ -204,7 +174,6 @@ span.chamfer-sm.bg-neon:empty {
   transform: translateY(-6px);
 }
 
-/* ظلال متوهجة */
 .glow-neon {
   box-shadow: 0 10px 34px -8px rgba(173, 255, 43, 0.45);
 }

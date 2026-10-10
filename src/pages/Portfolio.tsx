@@ -1,18 +1,12 @@
 import { useMemo, useState, type ReactNode } from "react";
-// استيراد أيقونات المجلد والمستخدم للتبديل بين وضعي الفلترة
 import { FolderOpen, User } from "lucide-react";
-// استيراد مكون خلفية البرق الجمالية
 import Lightning from "../components/Lightning";
-// استيراد مكونات الشارة وحركات الظهور
 import { Chip, Reveal } from "../components/ui";
-// استيراد خطاف حالة الموقع لجلب بيانات المشاريع والفئات
 import { useSite } from "../lib/store";
 import type { PortfolioItem } from "../lib/types";
 
-// تحديد وضعي الفلترة المتاحين في الصفحة: حسب الفئة أو حسب العميل
 type Mode = "category" | "client";
 
-// دالة مساعدة لتحويل نسبة المقاس المحددة للمشروع إلى CSS Aspect Ratio ديناميكي
 const getAspectStyle = (w: PortfolioItem): React.CSSProperties => {
   if (w.aspectRatio === "custom" && w.customWidth && w.customHeight) {
     return { aspectRatio: `${w.customWidth} / ${w.customHeight}` };

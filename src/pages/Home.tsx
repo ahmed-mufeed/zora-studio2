@@ -1,14 +1,11 @@
 import { Link } from "react-router-dom";
-// استيراد الأيقونات من مكتبة Lucide (تم استبدال Zap بـ Sparkles بنجاح)
 import { ArrowLeft, BadgePercent, ChevronDown, Gem, MessagesSquare, Sparkles, type LucideIcon } from "lucide-react";
-// استيراد المكونات الفرعية الخاصة بالصفحة الرئيسية
 import Lightning from "../components/Lightning";
 import Partners from "../components/Partners";
 import ServiceCard from "../components/ServiceCard";
 import Testimonials from "../components/Testimonials";
 import { Chip, CtaLink, SectionHead, Reveal } from "../components/ui";
 import { IMG } from "../lib/data";
-// استيراد خطاف حالة الموقع العامة
 import { useSite } from "../lib/store";
 import type { Feature, PortfolioItem } from "../lib/types";
 
@@ -19,7 +16,6 @@ const FEATURE_ICONS: Record<Feature["icon"], LucideIcon> = {
   chat: MessagesSquare,
 };
 
-// دالة مساعدة لتحويل نسبة المقاس المحددة للمشروع إلى CSS Aspect Ratio ديناميكي
 const getAspectStyle = (w: PortfolioItem): React.CSSProperties => {
   if (w.aspectRatio === "custom" && w.customWidth && w.customHeight) {
     return { aspectRatio: `${w.customWidth} / ${w.customHeight}` };
@@ -82,17 +78,19 @@ export default function Home() {
             </div>
           </Reveal>
 
-          <Reveal delay={0.42}>
-            <dl className="mt-20 grid max-w-3xl grid-cols-2 gap-y-8 md:grid-cols-4">
-              {content.stats.map((s, i) => (
-                <div key={i} className={`${i > 0 ? "border-r border-white/10 pr-6" : ""}`}>
-                  <dt className="sr-only">{s.label}</dt>
-                  <dd className="font-latin text-3xl font-bold text-neon md:text-4xl">{s.value}</dd>
-                  <dd className="mt-1 text-sm font-bold text-paper/45">{s.label}</dd>
-                </div>
-              ))}
-            </dl>
-          </Reveal>
+          {settings.sections.stats && (
+            <Reveal delay={0.42}>
+              <dl className="mt-20 grid max-w-3xl grid-cols-2 gap-y-8 md:grid-cols-4">
+                {content.stats.map((s, i) => (
+                  <div key={i} className={`${i > 0 ? "border-r border-white/10 pr-6" : ""}`}>
+                    <dt className="sr-only">{s.label}</dt>
+                    <dd className="font-latin text-3xl font-bold text-neon md:text-4xl">{s.value}</dd>
+                    <dd className="mt-1 text-sm font-bold text-paper/45">{s.label}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Reveal>
+          )}
         </div>
 
         <ChevronDown className="absolute bottom-8 right-1/2 z-10 h-6 w-6 translate-x-1/2 animate-bounce text-paper/40" />

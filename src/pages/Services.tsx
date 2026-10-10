@@ -1,26 +1,15 @@
-// استيراد أيقونة الاستفسار من مكتبة Lucide (تمت إزالة أيقونة البرق Zap بنجاح)
 import { MessageCircleQuestion } from "lucide-react";
-// استيراد مكون خلفية البرق الجمالية
 import Lightning from "../components/Lightning";
-// استيراد مكوّن بطاقة الخدمة الموحد
 import ServiceCard from "../components/ServiceCard";
-// استيراد مكونات الشارة وزر الرابط الخارجي
 import { Chip, CtaA } from "../components/ui";
-// استيراد خطاف حالة الموقع ودالة توليد رابط محادثة الواتساب
 import { useSite, waLink } from "../lib/store";
 
 export default function Services() {
-  // جلب بيانات الموقع من المتجر العام
   const { state } = useSite();
-  // تصفية الخدمات وجلب الخدمات غير المخفية فقط
   const services = state.services.filter((s) => !s.hidden);
 
   return (
     <main className="bg-ink">
-      
-      {/* =========================================================
-          قسم الهيدر: عنوان صفحة الخدمات والوصف الترويجي
-          ========================================================= */}
       <section className="relative overflow-hidden pb-24 pt-40">
         <Lightning />
         
@@ -37,13 +26,8 @@ export default function Services() {
         </div>
       </section>
 
-      {/* =========================================================
-          قسم شبكة الخدمات وصندوق الاستفسار عن خدمة مخصصة
-          ========================================================= */}
       <section className="slant-r bg-paper pb-28 pt-24 text-ink md:pt-28">
         <div className="mx-auto max-w-7xl px-5">
-          
-          {/* عرض شبكة الخدمات أو رسالة الحالة الفارغة */}
           {services.length === 0 ? (
             <p className="py-24 text-center text-lg font-bold text-ink/40">لا توجد خدمات متاحة حاليًا.</p>
           ) : (
@@ -54,16 +38,10 @@ export default function Services() {
             </div>
           )}
 
-          {/* =========================================================
-              صندوق المساعدة: لطلب حلول مخصصة غير مدرجة بالقائمة
-              ========================================================= */}
           <div className="chamfer relative mt-20 overflow-hidden bg-ink p-8 text-paper md:p-12">
-            {/* دائرة توهج إضاءة خلفية ضبابية */}
             <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-royal/50 blur-3xl" />
             
             <div className="relative z-10 flex flex-wrap items-center justify-between gap-6">
-              
-              {/* تفاصيل الاستفسار والأيقونة */}
               <div className="flex items-center gap-4">
                 <span className="chamfer-sm grid h-12 w-12 shrink-0 place-items-center bg-royal text-neon">
                   <MessageCircleQuestion className="h-6 w-6" />
@@ -76,7 +54,6 @@ export default function Services() {
                 </div>
               </div>
 
-              {/* زر التواصل عبر واتساب لطلب خدمة مخصصة (تمت إزالة أيقونة البرق من داخله) */}
               <CtaA href={waLink(state.settings.whatsapp, "مرحبًا! أبحث عن خدمة مخصصة غير موجودة في القائمة.")}>
                 اسأل عن خدمة مخصصة
               </CtaA>

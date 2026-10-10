@@ -5,15 +5,12 @@ export interface BriefQuestion {
   type: FieldType;
   label: string;
   required: boolean;
-  /** choice / checkbox */
   options?: string[];
   allowCustom?: boolean;
-  /** slider */
   min?: number;
   max?: number;
   step?: number;
   unit?: string;
-  /** text */
   placeholder?: string;
 }
 
@@ -31,7 +28,6 @@ export interface Service {
   questions: BriefQuestion[];
 }
 
-// تطوير هيكل أعمال المعرض لدعم المقاسات الجديدة والمقاسات اليدوية بالبكسل مع ميزة قفل التناسب
 export interface PortfolioItem {
   id: string;
   title: string;
@@ -41,9 +37,9 @@ export interface PortfolioItem {
   tags: string[];
   year: string;
   aspectRatio?: "auto" | "square" | "portrait" | "landscape" | "widescreen" | "story" | "banner" | "custom";
-  customWidth?: number;  // العرض المخصص بالبكسل
-  customHeight?: number; // الارتفاع المخصص بالبكسل
-  lockAspectRatio?: boolean; // خيار تثبيت نسبة التناسب بين الطول والعرض
+  customWidth?: number;
+  customHeight?: number;
+  lockAspectRatio?: boolean;
 }
 
 export interface PortfolioCategory {
@@ -64,7 +60,7 @@ export interface Testimonial {
 export interface Partner {
   id: string;
   name: string;
-  logo?: string; // شعار الشريك (رابط أو Base64) — اختياري
+  logo?: string;
 }
 
 export interface CustomPage {
@@ -102,7 +98,14 @@ export interface SiteContent {
   footerAbout: string;
 }
 
-export type SectionKey = "partners" | "services" | "portfolio" | "about" | "testimonials" | "cta";
+export type SectionKey =
+  | "partners"
+  | "services"
+  | "portfolio"
+  | "about"
+  | "testimonials"
+  | "cta"
+  | "stats";
 
 export interface Settings {
   whatsapp: string;
@@ -149,4 +152,5 @@ export const SECTION_LABELS: Record<SectionKey, string> = {
   about: "قسم لماذا زورا",
   testimonials: "قسم آراء العملاء",
   cta: "قسم الدعوة الختامية",
+  stats: "الأرقام والإحصاءات",
 };
