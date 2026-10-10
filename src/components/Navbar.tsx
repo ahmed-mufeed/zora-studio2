@@ -10,6 +10,7 @@ const LINKS = [
   { to: "/", label: "الرئيسية" },
   { to: "/services", label: "خدماتنا" },
   { to: "/portfolio", label: "أعمالنا" },
+  { to: "/AboutUs", label: "من أنا؟" },
 ];
 
 export default function Navbar() {

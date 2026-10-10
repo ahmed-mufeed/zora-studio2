@@ -16,7 +16,9 @@ import ServiceDetail from "./pages/ServiceDetail";
 import Portfolio from "./pages/Portfolio";
 import Brief from "./pages/Brief";
 import CustomPage from "./pages/CustomPage";
+import AboutUs from "./pages/AboutUs";
 import AdminLayout from "./admin/AdminLayout";
+
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -77,6 +79,7 @@ function Shell() {
         <Route path="/services/:serviceId/brief" element={<Brief />} />
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/p/:slug" element={<CustomPage />} />
+        <Route path="/AboutUs" element={<AboutUs />} />
         <Route path="/admin/*" element={<AdminLayout />} />
         <Route path="*" element={<Home />} />
       </Routes>
